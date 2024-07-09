@@ -36,7 +36,6 @@ export default function UserAuthForm() {
   });
 
   const onSubmit = async (data: UserFormValue) => {
-    console.log(process.env.NEXTAUTH_SECRET+ "ghjghgfjvhkfgchvgfgcvbgvbcncgv");
     signIn('credentials', {
       email: data.email,
       callbackUrl: callbackUrl ?? '/dashboard'
