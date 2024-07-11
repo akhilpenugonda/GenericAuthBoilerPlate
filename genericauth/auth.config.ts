@@ -2,14 +2,12 @@ import { NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
-import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient()
 
 const authConfig = {
-  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
     GithubProvider({
@@ -67,6 +65,46 @@ const authConfig = {
     signIn: '/' //sigin page
   },
   secret: process.env.NEXTAUTH_SECRET, 
+  callbacks:{
+    signIn: async ({ user, account }) => {
+      if (account?.provider === "google" || account?.provider === "github") {
+        try {
+          console.log(user, account);
+          const {email, name, image, id, provider, providerAccountId } = user as any;
+          const alreadyUser = await prisma.user.findUnique({
+            where: {
+              email: user.email as string
+            }
+          });
+
+          if (!alreadyUser) {
+            await prisma.user.create({
+              data: {
+                email: email as string,
+                name: name as string,
+                image: image as string,
+                providerName: provider as string,
+                providerId: id as string,
+                providerAccountId: providerAccountId as string,
+                createdAt: new Date(),
+                updatedAt: new Date()
+              }
+            });
+            return true;
+          } else {
+            return true;
+          }
+        } catch (error) {
+          throw new Error("Error while creating user");
+        }
+      }
+      if (account?.provider === "credentials") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  }
 } satisfies NextAuthConfig;
 
 export default authConfig;

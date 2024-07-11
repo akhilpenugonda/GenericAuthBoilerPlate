@@ -43,7 +43,7 @@ export default function AuthenticationPage() {
             <p className="text-lg">
               &ldquo;A simple library with auth and beautiful dash board ready to be used&rdquo;
             </p>
-            <footer className="text-sm">Sofia Davis</footer>
+            {/* <footer className="text-sm">Sofia Davis</footer> */}
           </blockquote>
         </div>
       </div>
