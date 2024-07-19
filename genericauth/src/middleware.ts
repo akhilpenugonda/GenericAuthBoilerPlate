@@ -3,11 +3,16 @@
 // https://nextjs.org/docs/app/building-your-application/routing/middleware
 
 import NextAuth from 'next-auth';
-import authConfig from './auth.config';
-
+// import authConfig from '../auth.config';
+const authConfig = {
+  providers: [],
+}
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
+
+export default auth(async (req) => {
+  const session = await auth();
+  console.log('auth middleware', session);
   if (!req.auth) {
     const url = req.url.replace(req.nextUrl.pathname, '/');
     return Response.redirect(url);
